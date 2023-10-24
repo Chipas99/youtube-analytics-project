@@ -1,7 +1,10 @@
 from src.channel import Channel
 
 if __name__ == '__main__':
-    moscowpython = Channel('UC-OVMPlMA3-YCIeg4z5z23A')
+    channel_id = 'UC-OVMPlMA3-YCIeg4z5z23A'
+    api_key = 'AIzaSyCBkEoN98s8GvGgp0qTByAmiWnCZOo7uFo'
+
+    moscowpython = Channel('UC-OVMPlMA3-YCIeg4z5z23A', 'AIzaSyCBkEoN98s8GvGgp0qTByAmiWnCZOo7uFo')
     moscowpython.print_info()
 
     """

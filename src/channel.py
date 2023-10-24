@@ -1,32 +1,29 @@
-import requests
+from googleapiclient.discovery import build
+from googleapiclient.errors import HttpError
 
 class Channel:
     """Класс для ютуб-канала"""
 
-    def __init__(self, channel_id: str) -> None:
+    def __init__(self, channel_id: str, api_key) -> None:
         """Экземпляр инициализируется id канала. Дальше все данные будут подтягиваться по API."""
-        self.channel_id = 'UCthfjHehYgSyhf8ONjzJMUw'
+        self.channel_id = channel_id
+        self.api_key = api_key
 
     def print_info(self) -> None:
-        """Выводит в консоль информацию о канале."""
-        api_key = "AIzaSyCBkEoN98s8GvGgp0qTByAmiWnCZOo7uFo"
+        try:
+            youtube = build('youtube', 'v3', developerKey=self.api_key)
+            response = youtube.channels().list(part='snippet,contentDetails,statistics', id=self.channel_id).execute()
 
+            channel_info = response['items'][0]
+            snippet = channel_info['snippet']
+            statistics = channel_info['statistics']
 
-        """Формируем URL для получения информации о канале"""
-        url = f"https://www.googleapis.com/youtube/v3/channels?part=snippet&id={self.channel_id}&key={api_key}"
+            print('Channel Name:', snippet['title'])
+            print('Description:', snippet['description'])
+            print('Published At:', snippet['publishedAt'])
+            print('View Count:', statistics['viewCount'])
+            print('Subscriber Count:', statistics['subscriberCount'])
+            print('Video Count:', statistics['videoCount'])
 
-
-        """Отправляем GET-запрос к API"""
-
-        response = requests.get(url)
-        data = response.json()
-
-        """Парсим полученные данные и выводим информацию о канале"""
-
-        channel_title = data["items"][0]["snippet"]["title"]
-        channel_description = data["items"][0]["snippet"]["description"]
-       # channel_subscriber_count = data["items"][0]["statistics"]["subscriberCount"]
-
-        print("Название канала:", channel_title)
-        print("Описание канала:", channel_description)
-       # print("Число подписчиков:", channel_subscriber_count)
+        except HttpError as e:
+            print(f'An HTTP error {e.resp.status} occurred: {e.content}')
