@@ -1,6 +1,6 @@
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
-
+import json
 class Channel:
     """Класс для ютуб-канала"""
 
@@ -9,21 +9,58 @@ class Channel:
         self.channel_id = channel_id
         self.api_key = api_key
 
-    def print_info(self) -> None:
+        self.title = None
+        self.description = None
+        self.url = None
+        self.subscriber_count = None
+        self.video_count = None
+        self.view_count = None
+
+        self.get_channel_info()
+
+    @classmethod
+    def get_service(cls, api_key):
+        return build('youtube', 'v3', developerKey=api_key)
+
+    def get_channel_info(self):
         try:
-            youtube = build('youtube', 'v3', developerKey=self.api_key)
+            youtube = self.get_service(self.api_key)  # Передаем параметр api_key методу get_service
             response = youtube.channels().list(part='snippet,contentDetails,statistics', id=self.channel_id).execute()
 
             channel_info = response['items'][0]
             snippet = channel_info['snippet']
             statistics = channel_info['statistics']
 
-            print('Channel Name:', snippet['title'])
-            print('Description:', snippet['description'])
-            print('Published At:', snippet['publishedAt'])
-            print('View Count:', statistics['viewCount'])
-            print('Subscriber Count:', statistics['subscriberCount'])
-            print('Video Count:', statistics['videoCount'])
+            self.title = snippet['title']
+            self.description = snippet['description']
+            self.url = f"https://www.youtube.com/channel/{self.channel_id}"
+            self.subscriber_count = statistics['subscriberCount']
+            self.video_count = statistics['videoCount']
+            self.view_count = statistics['viewCount']
 
         except HttpError as e:
-            print(f'An HTTP error {e.resp.status} occurred: {e.content}')
+            print(f'An HTTP error {e.resp.status} occurred')
+
+    def print_info(self):
+        """Печатает информацию о канале"""
+        print(f"Channel ID: {self.channel_id}")
+        print(f"Channel Name: {self.title}")
+        print(f"Description: {self.description}")
+        print(f"Channel Link: {self.url}")
+        print(f"Subscriber Count: {self.subscriber_count}")
+        print(f"Video Count: {self.video_count}")
+        print(f"View Count: {self.view_count}")
+
+    def to_json(self, filename):
+        data = {
+             'channel_id': self.channel_id,
+             'channel_name': self.title,
+             'description': self.description,
+             'channel_link': self.url,
+             'subscriber_count': self.subscriber_count,
+             'video_count': self.video_count,
+             'view_count': self.view_count
+        }
+
+        with open(filename, 'w') as file:
+            json.dump(data, file)
