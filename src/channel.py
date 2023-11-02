@@ -64,3 +64,34 @@ class Channel:
 
         with open(filename, 'w') as file:
             json.dump(data, file)
+
+    def __str__(self):
+        """Возвращает название и ссылку на канал"""
+        return f"{self.title} ({self.url})"
+
+    def __add__(self, other):
+        """Складывает два канала по количеству подписчиков"""
+        return int(self.subscriber_count) + int(other.subscriber_count)
+
+    def __sub__(self, other):
+        """Вычитает количество подписчиков другого канала из текущего"""
+        return int(self.subscriber_count) - int(other.subscriber_count)
+
+    '''методы сравнения __gt__, __ge__, __lt__, __le__, __eq__ и __ne__'''
+    def __gt__(self, other):
+        return self.subscriber_count > other.subscriber_count
+
+    def __ge__(self, other):
+        return self.subscriber_count >= other.subscriber_count
+
+    def __lt__(self, other):
+        return self.subscriber_count < other.subscriber_count
+
+    def __le__(self, other):
+        return self.subscriber_count <= other.subscriber_count
+
+    def __eq__(self, other):
+        return self.subscriber_count == other.subscriber_count
+
+    def __ne__(self, other):
+        return self.subscriber_count != other.subscriber_count
